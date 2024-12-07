@@ -1,0 +1,126 @@
+{% extends "base/base.html" %}
+
+{% block titulo %}
+    Listado de Proveedores
+{% endblock %}
+
+{% load static %}
+
+{% block contenido %}
+
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.css">
+
+<!-- Begin Page Content -->
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <h1 class="h3 mb-5 text-gray-800">Listado de Proveedores</h1>
+
+    <!-- DataTales Example -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="h5 m-0 font-weight-bold text-primary">Proveedores</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="exampleProv" width="100%" cellspacing="0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>RUC</th>
+                            <th>Correo</th>
+                            <th>Dirección</th>
+                            <th>Teléfono</th>
+                            <th>Producto</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if proveedores %} <!-- Si existe algun proveedor -->
+                        {% for prov in proveedores %}
+                        <tr>
+                            <th scope="row">{{prov.id}}</th>
+                            <td>{{prov.nombre}}</td>
+                            <td>{{prov.ruc}}</td>
+                            <td>{{prov.correo}}</td>
+                            <td>{{prov.direccion}}</td>
+                            <td>{{prov.telefono}}</td>
+                            <td>{{prov.producto}}</td>
+                            <td class="text-center">
+                                <a href="{% url 'editarProveedor' prov.id %}" class="btn btn-warning mr-3"><i class="bi bi-pencil"></i></a>
+                                <a class="btn btn-danger delete-btn" data-url="{% url 'eliminarProveedores' prov.id %}"><i class="bi bi-trash"></i></a>
+                            </td>    
+                        </tr>
+                        {% endfor %}
+                        
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+<!-- /.container-fluid -->
+
+
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
+<script>
+    var table = new DataTable('#exampleProv', {
+        language: {
+            url: '{% static "js/es-MX.json" %}',
+            emptyTable: "No hay proveedores registrados",
+        },
+});
+</script>
+
+<!-- Sweet alert 2 Import -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Sweet alert 2 SCRIPT MODAL -->
+<script>
+    // Añadir evento a los botones con la clase delete-btn
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            // Obtener la URL del atributo data-url
+            const deleteUrl = this.dataset.url;
+
+            // Configurar y mostrar SweetAlert
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: "btn btn-success mx-4",
+                    cancelButton: "btn btn-danger"
+                },
+                buttonsStyling: false
+            });
+
+            swalWithBootstrapButtons.fire({
+                title: "¿Estás seguro?",
+                text: "¡No podrás revertir esto!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sí, eliminar",
+                cancelButtonText: "No, cancelar",
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Redirigir a la URL de eliminación si el usuario confirma
+                    window.location.href = deleteUrl;
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    // Mostrar mensaje de cancelación
+                    swalWithBootstrapButtons.fire({
+                        title: "Cancelado",
+                        text: "Tu proveedor está a salvo :)",
+                        icon: "error"
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}
